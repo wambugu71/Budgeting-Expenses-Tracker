@@ -50,8 +50,6 @@ jobs:
 
       - name: Flutter pub get
         run: flutter pub get
-      - name: create  database
-        run:   dart run build_runner build 
       - name: gen icons
         run:  dart run flutter_launcher_icons   
 
@@ -72,7 +70,6 @@ jobs:
         run: |
           flutter config --enable-macos-desktop
           - name: create  database
-          dart run build_runner build 
           dart run flutter_launcher_icons   
           flutter build macos --release
           # Create a ZIP file of the macOS app
@@ -84,8 +81,6 @@ jobs:
         if: contains(matrix.targets, 'windows')
         run: |
           flutter config --enable-windows-desktop
-          - name: create  database
-          dart run build_runner build 
           dart run flutter_launcher_icons   
           flutter build windows --release
           cd build\windows\x64\runner\Release
@@ -95,7 +90,6 @@ jobs:
         if: contains(matrix.targets, 'linux')
         run: |
           flutter config --enable-linux-desktop
-          dart run build_runner build
           dart run flutter_launcher_icons   
           flutter build linux --release
           # Create a TAR file of the Linux app
@@ -106,7 +100,6 @@ jobs:
       - name: Build Web
         if: contains(matrix.targets, 'web')
         run: |
-          dart run build_runner build
           dart run flutter_launcher_icons   
           flutter build web --release
           # Create a ZIP file of the web app
