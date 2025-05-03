@@ -1,6 +1,6 @@
 # Expense Tracker App
 
-![Expense Tracker Banner](https://via.placeholder.com/1200x300/0218ff/FFFFFF/?text=ExpenseTracker)
+![Expense Tracker Banner](images/logo.png)
 
 ## Overview
 
@@ -27,9 +27,10 @@ Expense Tracker is a comprehensive personal finance management application built
 ## Screenshots
 
 <div style="display: flex; justify-content: space-between;">
-    <img src="https://via.placeholder.com/250x500/0218ff/FFFFFF/?text=Home" width="30%" alt="Home Screen">
-    <img src="https://via.placeholder.com/250x500/0218ff/FFFFFF/?text=Profile" width="30%" alt="Profile Screen">
-    <img src="https://via.placeholder.com/250x500/0218ff/FFFFFF/?text=Settings" width="30%" alt="Settings Screen">
+    <img src="images/home.jpg" width="30%" alt="Home Screen">
+    <img src="images/profile.jpg" width="30%" alt="Profile Screen">
+    <img src="images/settings.jpg" width="30%" alt="Settings Screen">
+    <img src="images/analysis.jpg" width="30%" alt="Analysis Screen">
 </div>
 
 ## Architecture
