@@ -169,12 +169,12 @@ Future<void> _authenticate() async {
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/expense_tracker.git
+git clone https://github.com/wambugu71/Budgeting-Expenses-Tracker.git
 ```
 
 2. Navigate to the project directory
 ```bash
-cd expense_tracker
+cd Budgeting-Expenses-Tracker
 ```
 
 3. Install dependencies
