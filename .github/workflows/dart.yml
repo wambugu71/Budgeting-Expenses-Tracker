@@ -1,0 +1,160 @@
+name: ExpenseTracker Builds
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [created]
+  # Alternative: Trigger on tags
+  # push:
+  #   tags:
+  #     - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            targets: android,web,linux
+          - os: windows-latest
+            targets: windows
+          - os: macos-latest
+            targets: ios,macos
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.27.3'
+      
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Flutter pub get
+        run: flutter pub get
+      - name: create  database
+        run:   dart run build_runner build 
+      - name: gen icons
+        run:  dart run flutter_launcher_icons   
+
+      # Android Build
+      - name: Build Android APK
+        if: contains(matrix.targets, 'android')
+        run: flutter build apk --release --target-platform android-arm
+      
+      # iOS Build
+      - name: Build iOS
+        if: contains(matrix.targets, 'ios')
+        run: |
+          flutter build ios --release --no-codesign
+      
+      # macOS Build
+      - name: Build macOS
+        if: contains(matrix.targets, 'macos')
+        run: |
+          flutter config --enable-macos-desktop
+          - name: create  database
+          dart run build_runner build 
+          dart run flutter_launcher_icons   
+          flutter build macos --release
+          # Create a ZIP file of the macOS app
+          cd build/macos/Build/Products/Release
+          zip -r macos-app.zip *.app
+      
+      # Windows Build
+      - name: Build Windows
+        if: contains(matrix.targets, 'windows')
+        run: |
+          flutter config --enable-windows-desktop
+          - name: create  database
+          dart run build_runner build 
+          dart run flutter_launcher_icons   
+          flutter build windows --release
+          cd build\windows\x64\runner\Release
+          Compress-Archive -Path *.exe -DestinationPath "windows-app.zip"
+      # Linux Build
+      - name: Build Linux
+        if: contains(matrix.targets, 'linux')
+        run: |
+          flutter config --enable-linux-desktop
+          dart run build_runner build
+          dart run flutter_launcher_icons   
+          flutter build linux --release
+          # Create a TAR file of the Linux app
+          cd build/linux/x64/release/bundle
+          tar -czf linux-app.tar.gz *
+      
+      # Web Build
+      - name: Build Web
+        if: contains(matrix.targets, 'web')
+        run: |
+          dart run build_runner build
+          dart run flutter_launcher_icons   
+          flutter build web --release
+          # Create a ZIP file of the web app
+          cd build/web
+          zip -r web-app.zip *
+      
+      # Upload artifacts for workflow use
+      - name: Upload Android Build
+        if: contains(matrix.targets, 'android')
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+      
+      - name: Upload iOS Build
+        if: contains(matrix.targets, 'ios')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios/iphoneos
+      
+      - name: Upload macOS Build
+        if: contains(matrix.targets, 'macos')
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: build/macos/Build/Products/Release/macos-app.zip
+      
+      - name: Upload Windows Build
+        if: contains(matrix.targets, 'windows')
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/windows/runner/Release/windows-app.zip
+      
+      - name: Upload Linux Build
+        if: contains(matrix.targets, 'linux')
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: build/linux/x64/release/bundle/linux-app.tar.gz
+      
+      - name: Upload Web Build
+        if: contains(matrix.targets, 'web')
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web/web-app.zip
+      
